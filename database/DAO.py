@@ -52,27 +52,27 @@ class DAO():
         return result
 
     @staticmethod
-    def getEdge(node1, node2, maxDays):
+    def getEdge(storeId, maxDays):
         result = []
         try:
             conn = DBConnect.get_connection()
             cursor = conn.cursor(dictionary=True)
             query = """ 
-                              select o.order_id, o2.order_id, sum(oi.quantity + oi2.quantity)
+                              select o.order_id as one, o2.order_id as two, sum(oi.quantity + oi2.quantity) as weight
                                 from bike_store_full.orders o, bike_store_full.order_items oi , bike_store_full.orders o2, bike_store_full.order_items oi2
-                                where 		o.store_id = 1 
+                                where 		o.store_id = %s 
                                         and o.order_id = oi.order_id
                                         and o2.order_id = oi2.order_id
                                         and o.store_id = o2.store_id
-                                        and datediff(o.order_date, o2.order_date) < 5
+                                        and datediff(o.order_date, o2.order_date) < %s
                                         and o.order_date > o2.order_date
                                 group by o.order_id, o2.order_id 
 
                            """
-            cursor.execute(query, (int(storeId),))
+            cursor.execute(query, (int(storeId), int(maxDays)))
 
             for row in cursor:
-                result.append(row["order_id"])
+                result.append((row["one"], row["two"], row["weight"]))
 
         except Exception as e:
             print(f"Error fetching colors: {e}")

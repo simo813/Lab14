@@ -1,3 +1,5 @@
+from logging import disable
+
 import flet as ft
 
 
@@ -5,6 +7,7 @@ class View(ft.UserControl):
     def __init__(self, page: ft.Page):
         super().__init__()
         # page stuff
+
 
         self._page = page
         self._page.title = "TdP Lab 14 - simulazione esame"
@@ -23,6 +26,8 @@ class View(ft.UserControl):
         self.txtIntK = None
         self.ddStore = None
         self.ddStoreValue = None
+        self.ddNode = None
+        self.ddNodeValue = None
 
     def load_interface(self):
         # title
@@ -41,13 +46,13 @@ class View(ft.UserControl):
         self._btnCerca = ft.ElevatedButton(text="Cerca Percorso Massimo",
                                            on_click=self._controller.handleCerca)
 
-        self._ddNode = ft.Dropdown(label="Node")
-        cont2 = ft.Container(self._ddNode, width=250, alignment=ft.alignment.top_left)
+        self.ddNode = ft.Dropdown(label="Node", disabled=True, on_change=self.on_dropdownNode_change)
+        cont2 = ft.Container(self.ddNode, width=250, alignment=ft.alignment.top_left)
         row2 = ft.Row([cont2, ft.Container(self._btnCerca, width=250)
         ], alignment=ft.MainAxisAlignment.CENTER)
 
         self._btnRicorsione = ft.ElevatedButton(text="Ricorsione",
-                                           on_click=self._controller.handleRicorsione)
+                                           on_click=self._controller.handleRicorsione, disabled=True)
 
         row3 = ft.Row([ft.Container(self._btnRicorsione, width=250)
                        ], alignment=ft.MainAxisAlignment.CENTER)
@@ -74,6 +79,10 @@ class View(ft.UserControl):
 
     def on_dropdownStore_change(self, e):
         self.ddStoreValue = self.ddStore.value
+        self.update_page()
+
+    def on_dropdownNode_change(self, e):
+        self.ddNodeValue = self.ddNode.value
         self.update_page()
 
     def update_page(self):
